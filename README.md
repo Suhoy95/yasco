@@ -62,7 +62,7 @@ network throughput.
 able to guarantee that HAVM will be available even with `X` crushed hardware
 machines. In other words, we want to split HWM into `Y` spare slots, each of them
 will be correspond one of VM or HAVM, and also several free slots for HAVMs if
-`n<X` HWMs are down.
+`n<X` HWMs are down. Let's call it Virtual Distributed Map (VDM).
 
 ```
              +------+                 +------+                        +------+
@@ -102,25 +102,116 @@ resources which **you have, but do not use**, because of provisioning purposes.
 but as more general case. Currently, I am not solving this problem, but create
 a PoC which uses its solution to handle HA requirements.
 
-## Theoretical real-life solution
+## Solution in the real-life architecture context
 
+I assume that cluster has general two-parts architecture: the virtual farm with
+HWMs and distributed storage for easy migration and evacuation of HAVM instances:
 
+```
+                                    Internet
++---+-----------+-------------+---+    or
+    |           |             |    Gateway(s)
++---+---+   +---+---+     +---+---+
+|       |   |       |     |       |
+| HWM_1 |   | HWM_2 | ... | HWM_K |
+|       |   |       |     |       |
++---+---+   +---+---+     +---+---+
+    |           |             |
++---+-+---------+-----------+-+---+ Internal
+      |                     |       Network
++-----+---------------------+-----+
+|                                 |
+|       Distributed storage       |
+|                                 |
++---------------------------------+
+```
+
+*Note*: it is really questionable is it worth to keep VM's images in
+the distributed storage or not, while we assume that we have the static VDM and
+do not plan to move VM instance to another node.
+
+We will build our HA orchestration over already deployed study cluster:
+
+```
++--------------------------------+   +-----------------------------+
+|                                |   |                             |
+| +--------------+ +-----------+ |   | +---------+ +-------------+ |
+| |              | |           | |   | |         | |             | |
+| | freebsd-vmm2 | | win7-vmm2 | |   | |  test   | | ubuntu-vmm2 | |
+| |              | |           | |   | |         | |             | |
+| +--------------+ +-----------+ |   | +---------+ +-------------+ |
+|                                |   |                             |
+|  HVM_1 Ilya's node (QEMU/KVM)  |   |HVM_2 Ayrat's node (QEMU/KVM)|
++-----------------+--------------+   +------------+----------------+
+                  |                               |
+                  +----------------+--------------+
+                                   |
+                 +-----------------+-----------------+
+                 |                                   |
+                 | +-------+   +-------+   +-------+ |
+                 | |       |   |       |   |       | |
+                 | | ceph1 |   | ceph2 |   | ceph3 | |
+                 | |       |   |       |   |       | |
+                 | +-------+   +-------+   +-------+ |
+                 |                                   |
+                 |  HVM_3 Andrey's node (QEMU/KVM)   |
+                 +-----------------------------------+
+```
+
+Currently I am not consider the real VMs and HVMs resources. We want to all VMs
+be a HAVM. Andrey's cluster node is considered as absolutely stable (it should
+be bare-metal CEPH fault tolerance cluster).
+
+For administration purpose, we place that map and VM configuration to dedicated
+CephFS. And deploy `etcd` on each HVM node to keep state of cluster in quorum
+and maintain it during work.
+
+In that situations there are two evacuation distributions:
+
+1. Ilya's node fail:
+    - `Ayrat's node`: `test`, `ubuntu-vmm2`, `freebsd-vmm2`, `win7-vmm2`
+2. Ayrat's node fail:
+    - `Ilya's node`: `test`, `ubuntu-vmm2`, `freebsd-vmm2`, `win7-vmm2`
+
+*Note*: it is possible to take in consideration also Andrey's node. But I do not
+want to HAVMs influence to the ceph cluster, because they highly depended on it.
+And also we did not set up migrations ability between (Ayrat's node and Andrey's
+node) and (Ilya's node and Andrey's node).
+
+**Task**: write python daemon for Ilya's and Ayrat's nodes, which will pool the
+`etcd` to keep track of cluster state, perform node evacuation and migrate the
+HAVMs after node rescue.
 
 ### Solution notes
 
-TODO Note: problem of low-usage of virtual machines
+*Note 1*: cluster administrators have another problem of poor utilizing the cluster,
+because VMs often do not utilize its resources, and you can have low-load nodes.
+To facilitate it, for example, memory ballooning is used, or just put more VMs to
+the HVM. This approach is tricky as soon as the cluster provider can provide more
+virtual resources than it really has. The problem definition made to avoid that
+situation. You can go further, and try to define Virtual Distribution Map wrapping
+depends on the Cluster usage statistic to move some HAVM and VM to other HWM, and
+shutdown several HVM nodes while you do not have a high-load.
 
-TODO Note: problem of vertical virtual machine scale
+*Note 2*: During exploitation some applications (VMs) are wanted to be vertical
+scaled depends on load. It means that we need several Cluster Distribution Maps
+which will change depending on situation. We do not consider that case currently.
 
-TODO Note: problem of re-balancing
+*Note 3*: Other problem will be when we will add or remove VMs and HAVMs. It is
+pretty looks like re-balancing problem solved by CRUSH algorithm (CEPH). I think
+it could be solved in similar passion. At least in the worst case scenario, we
+can just calculate new CDM, and remigrate whole cluster, which will be horrible
+in a big scale.
 
-## Related works parallels
+*Note 4*: It reminds me the web-page evolution: in the beginning we had static
+document HTML pages, then started to generate WEB-application with MVC application,
+and then realized that we can take the template library and generate a static pages
+and avoid calculations on each page. Here the same way: for lite-middle size cluster
+we can pre-define VMs distribution, and also fault tolerances strategies for HA.
+After that the yasco daemon just need to monitor the current cluster state and
+apply the CDM depends on situation.
 
 ## Proof-Of-Concept
-
-### Predefined Cluster Setup
-
-### Architecture
 
 ### Implementation
 
