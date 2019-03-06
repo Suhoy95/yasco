@@ -31,6 +31,59 @@ among the cluster.
 
 *Note*: written in defining idea first approach.
 
+## The Cluster Knapsack problem
+
+*Note: Here is the more mathematical definition of the problem, which I realized at 5:23 AM. In the next section there is more explainable definition of the problem.*
+
+**We have:** set of virtual machines (VMs) and set of hardware machines (HWM),
+which combined into cluster. We want to distribute VMs among the cluster with
+two criteria quality:
+
+1. Valid, the resources of HWM is more than sum of occupying resources placed VMs
+2. Optimal, here a little bit difficult to define. But for example, we want to reduce
+amount of HWMs to reduce power consumption.
+
+The solution of the Cluster Knapsack problem is embodied by Cluster Distribution
+Map (CDM, or CD Map), which describe the place each VM_i in the the HWM_j.
+
+It is worth to mention, to each machine (hard or virtual) is at least 5-dimensions
+cube `(RAM, Storage Size, CPU time, NetRX, NetTX)`. And it is right to start from
+one dimension and define induction function over increasing dimensions. Because
+during cluster maintenance we can add statistic-based dimensions to optimize
+cluster experience.
+
+That the simplest basis for optimal cluster configuration, but there are variations
+of the problem:
+
+1. High Availability problem (HA). We want to some defined subset of VMs
+are working even if `X` hardware nodes has been failed. To do this we should
+provision spare space in the cluster for evacuated VMs from fault nodes.
+
+Here, we add to CD Map the fault redistribution maps for case that some subset
+of HWM are failed. It is desired to calculate them in advance to be able to make
+optimal orchestration decision right way.
+
+There we can find some guesses about problem solvability: the set of subsets of
+failed HWM with size less than `X` looks like Boolean, which means NP problem
+with memory if we want to precalculate all fault redistribution maps in advance.
+
+2. Another problem: the cluster users often do not utilize all VM resources
+during long time. So, it is worth to define a convolution function of CDM to
+place VMs on the less amount of HWM. And switch other freed HWMs to reduce power
+consumption.
+
+3. We need to understand that during cluster maintenance both sets (VMs and HWMs)
+are changing. So we need optimal redistribution algorithm to migrate from old
+CD Map to new CD Map.
+
+It is really looks like [Ceph's CRUSH algorithm](https://vk.com/away.php?to=https%3A%2F%2Fceph.com%2Fwp-content%2Fuploads%2F2016%2F08%2Fweil-crush-sc06.pdf&cc_key=)
+with different input conditions.
+
+4. The last one problem, I guess, solving with previous task context: depending
+on application high load we wants to change amount of VMs of the particular
+application. It may be as increasing under High Load, but also decreasing
+when High Load is gone.
+
 ## Problem definition
 
 Suppose, we have virtual machines farm. And we should manage `N` plain
