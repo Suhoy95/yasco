@@ -213,9 +213,17 @@ apply the CDM depends on situation.
 
 ## Proof-Of-Concept
 
-### Implementation
+TODO
 
-### Demonstration
+## License
+
+According to treatments about Results of Intellectual Activity, this is owned by
+the [Innopolis University](https://university.innopolis.ru/en/). As author
+I would like to make this work public under GPLv2.
+
+I will be glad to know if you would like to publish this work in scientific
+journals, because, I believe, there will be a lot of article to find optimal
+solutions of defined Cluster Knapsack problem
 
 ## References
 
@@ -230,3 +238,12 @@ apply the CDM depends on situation.
 - Preliminary whiteboard discussion:
 
 ![](images/whiteboard-concept.jpg)
+
+- It is one night repository. Such a lovely blizzard outside the Innopolis University:
+
+![](images/morning.jpg)
+
+- THat moment, when you decide to explain the problem math friend shortly, but instead of it
+made math problem definition and have to corrupt HTML page with dev-tools to make a good screenshot:
+
+![](images/2019-03-06-math-friend.png)
