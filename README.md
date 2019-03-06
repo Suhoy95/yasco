@@ -484,6 +484,71 @@ dom = libvirt_conn.lookupByID(domainIDs[0])
 
 ### Deploy etcd cluster
 
+- [GitHub. etcd-io / etcd : master/Documentation/demo.md](https://github.com/etcd-io/etcd/blob/master/Documentation/demo.md)
+
+1. Distribute etcd binaries:
+
+```bash
+wget https://github.com/etcd-io/etcd/releases/download/v3.3.12/etcd-v3.3.12-linux-amd64.tar.gz
+tar xf etcd-v3.3.12-linux-amd64.tar.gz
+
+scp etcd-v3.3.12-linux-amd64.tar.gz ayrat:~
+ssh ayrat tar xf etcd-v3.3.12-linux-amd64.tar.gz
+
+scp etcd-v3.3.12-linux-amd64.tar.gz andreys:~
+ssh andreys tar xf etcd-v3.3.12-linux-amd64.tar.gz
+```
+
+2. Make run shell scripts: `etcd-scripts/`:
+
+```bash
+0|suhoy@quark yasco$ ll etcd-scripts/
+total 24
+drwxr-xr-x  2 suhoy suhoy 4096 Mar  6 10:03 ./
+drwxr-xr-x 10 suhoy suhoy 4096 Mar  6 09:58 ../
+-rw-r--r--  1 suhoy suhoy  454 Mar  6 10:04 andreys-etcd.sh
+-rw-r--r--  1 suhoy suhoy  453 Mar  6 10:05 ayrat-etcd.sh
+-rw-r--r--  1 suhoy suhoy  324 Mar  6 10:02 cluster-config.sh
+-rw-r--r--  1 suhoy suhoy  453 Mar  6 10:05 ilya-etcd.sh
+```
+
+3. Distributing run scripts:
+
+```bash
+cp etcd-scripts/{cluster-config,ilya-etcd}.sh etcd-v3.3.12-linux-amd64/
+scp etcd-scripts/{cluster-config,ayrat-etcd}.sh ayrat:~/etcd-v3.3.12-linux-amd64/
+scp etcd-scripts/{cluster-config,andreys-etcd}.sh andreys:~/etcd-v3.3.12-linux-amd64/
+```
+
+4. Launch etcd cluster (in separate terminal, it will be in foreground logging mode):
+
+```bash
+cd etcd-v3.3.12-linux-amd64/
+bash ilya-etcd.sh
+
+ssh ayrat
+cd etcd-v3.3.12-linux-amd64/
+bash ayrat-etcd.sh
+
+ssh andreys
+cd etcd-v3.3.12-linux-amd64/
+bash andreys-etcd.sh
+```
+
+5. Verifying cluster state:
+
+```bash
+export ETCDCTL_API=3
+HOST_1=10.0.0.112
+HOST_2=10.0.0.109
+HOST_3=10.0.0.127
+ENDPOINTS=$HOST_1:2379,$HOST_2:2379,$HOST_3:2379
+
+etcdctl --endpoints=$ENDPOINTS member list
+```
+
+![](images/2019-03-06-10-18-verifying-etcd.png)
+
 ### Daemon main loop: monitoring cluster state
 
 ### Node failure handler: VMs evacuation
@@ -516,6 +581,7 @@ solutions of defined Cluster Knapsack problem
 - [Ceph docs. Luminous. CephFS Quick Start](http://docs.ceph.com/docs/luminous/start/quick-cephfs/)
 - [Ceph docs. Luminous. Create a Ceph filesystem](http://docs.ceph.com/docs/luminous/cephfs/createfs/)
 - [Libvirt Application Development Guide Using Python. Edition 1. Version 1.1](https://libvirt.org/docs/libvirt-appdev-guide-python/en-US/html/index.html)
+- [GitHub. etcd-io / etcd : master/Documentation/demo.md](https://github.com/etcd-io/etcd/blob/master/Documentation/demo.md)
 
 ## History notes
 
