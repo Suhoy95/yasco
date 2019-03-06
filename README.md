@@ -384,7 +384,103 @@ CDM_fallbacks = {
 Cur_CDM = CDM
 ```
 
-### Define VMM orchestration interface
+### Install requirements
+
+```bash
+sudo apt-get install libvirt-dev
+pip install libvirt-python
+pip install etcd3
+pip freeze > requirements.txt
+```
+
+### Check how libvirt library works
+
+```bash
+python3
+>>> import libvirt
+>>> libvirt_conn = libvirt.open("qemu:///system")
+```
+
+- get hostname
+
+```python3
+>>> libvirt_conn.getHostname()
+'quark'
+```
+
+- list defined Domains:
+
+```python3
+>>> libvirt_conn.listDefinedDomains()
+['freebsd-vmm2']
+```
+
+- list running Domains:
+
+```python3
+>>> domainIDs = libvirt_conn.listDomainsID()
+>>> for domainID in domainIDs:
+...     print(libvirt_conn.lookupByID(domainID).name())
+...
+freebsd-vmm2
+win7-vmm2
+```
+
+- start domain
+
+```python3
+>>> dom = libvirt_conn.lookupByName('freebsd-vmm2')
+>>> dom.create()
+0
+```
+
+- stop or destroy domain
+
+```python3
+dom = libvirt_conn.lookupByID(domainIDs[0])
+>>> dom.shutdown()
+0
+>>> dom.destroy()
+0
+```
+
+- define domain
+
+```python3
+>>> domainXML = None
+>>> with open('/srv/domains/freebsd-vmm2.xml') as f:
+...     domainXML = f.read()
+...
+>>> dom = libvirt_conn.createXML(domainXML, 0)
+```
+
+- undefine domain
+
+```python3
+>>> dom.undefine()
+0
+```
+
+- migrate domain round-trip:
+
+```python3
+>>> dest_conn = libvirt.open("qemu+ssh://ayrat/system")
+>>> dom = libvirt_conn.lookupByName("freebsd-vmm2")
+>>> new_dom = dom.migrate(dest_conn, 0, None, "tcp://ayrat:49152", 0)
+>>> dom = new_dom.migrate(libvirt_conn, 0, None, "tcp://10.0.0.112:49152", 0
+```
+
+- gracefully exits:
+
+```python3
+>>> libvirt_conn.close()
+1
+>>> dest_conn.close()
+1
+>>> del dom
+>>> del new_dom
+>>> quit()
+```
 
 ### Deploy etcd cluster
 
@@ -413,8 +509,13 @@ solutions of defined Cluster Knapsack problem
 - [SNE](https://os3.su/)
 - [asciiflow](http://asciiflow.com/)
 - [DO: How To Create a High Availability Setup with Heartbeat and Floating IPs on Ubuntu 14.04](https://www.digitalocean.com/community/tutorials/how-to-create-a-high-availability-setup-with-heartbeat-and-floating-ips-on-ubuntu-14-04)
+- [The Raft Consensus Algorithm](https://raft.github.io/)
 - [etcd](https://github.com/etcd-io/etcd)
 - [CephFS](http://docs.ceph.com/docs/master/cephfs/)
+- [libvirt: Python API bindings](https://libvirt.org/python.html)
+- [Ceph docs. Luminous. CephFS Quick Start](http://docs.ceph.com/docs/luminous/start/quick-cephfs/)
+- [Ceph docs. Luminous. Create a Ceph filesystem](http://docs.ceph.com/docs/luminous/cephfs/createfs/)
+- [Libvirt Application Development Guide Using Python. Edition 1. Version 1.1](https://libvirt.org/docs/libvirt-appdev-guide-python/en-US/html/index.html)
 
 ## History notes
 

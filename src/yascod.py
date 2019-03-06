@@ -2,19 +2,22 @@
 import argparse
 import logging
 
+import libvirt
+import etcd3
+
 CDM = {
-    "quark": [ # Ilya's node
+    "quark": [  # Ilya's node
         "freebsd-vmm2",
         "win7-vmm2",
     ],
-    "snailin": [ # Ayrat's node
+    "snailin": [  # Ayrat's node
         "test",
         "ubuntu-vmm2",
     ],
 }
 
 CDM_fallbacks = {
-    "quark": { # if Ilya's node is down
+    "quark": {  # if Ilya's node is down
         "snailin": [
             "freebsd-vmm2",
             "win7-vmm2",
@@ -22,7 +25,7 @@ CDM_fallbacks = {
             "ubuntu-vmm2",
         ],
     },
-    "snailin": { # if Ayrat's node is down
+    "snailin": {  # if Ayrat's node is down
         "quark": [
             "freebsd-vmm2",
             "win7-vmm2",
@@ -47,7 +50,7 @@ def parse_args():
     if not isinstance(numeric_level, int):
         raise ValueError('Invalid log level: %s' % args.log)
 
-    logging.basicConfig(level=numeric_level, filename="example.log",
+    logging.basicConfig(level=numeric_level,
                         format='%(asctime)s %(levelname)s %(message)s')
 
     return parser.parse_args()
