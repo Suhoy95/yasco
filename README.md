@@ -266,7 +266,18 @@ apply the CDM depends on situation.
 
 ## Proof-Of-Concept
 
-TODO
+It is PoC for simple engine if we can solve the Cluster Knapsack problem. For
+3 node I can defined it manually.
+
+### Dump cluster VMs configuration
+
+```bash
+virsh dumpxml freebsd-vmm2 > freebsd-vmm2.xml
+virsh dumpxml win7-vmm2 > win7-vmm2.xml
+virsh dumpxml test > test.xml
+virsh dumpxml ubuntu-vmm2 > ubuntu-vmm2.xml
+cp *.xml domains/
+```
 
 ## License
 
