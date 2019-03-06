@@ -3,6 +3,8 @@
 Orchestration of virtual machine with [libvirt](https://libvirt.org/) &amp;
 [etcd](https://github.com/etcd-io/etcd) &amp; [ceph](http://docs.ceph.com/docs/master/).
 
+Discussion is come in the telegram group: [https://t.me/yasco2019](https://t.me/yasco2019)
+
 ## Table Of Content
 
 [TOC]
@@ -548,6 +550,13 @@ etcdctl --endpoints=$ENDPOINTS member list
 ```
 
 ![](images/2019-03-06-10-18-verifying-etcd.png)
+
+### Test etcd3 python library
+
+TODO:
+
+- Detect detaching from cluster on the daemon side
+- Detect of neighbor fail
 
 ### Daemon main loop: monitoring cluster state
 
