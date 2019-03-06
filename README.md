@@ -11,7 +11,7 @@ Orchestration of virtual machine with [libvirt](https://libvirt.org/) &amp;
 
 This is moment, when you are studying [SNE](https://os3.su/), doing Virtual Machine
 Management lab with Cloud Orchestration. But it is the last night before deadline,
-And figuring out the other orchestration systems is too late, and I'm doubting
+And figuring out the other monsters orchestration systems is too late, and I'm doubting
 about its design and clearness. So It is better to use brute force and
 DO IT YOURSELF with python.
 
@@ -296,7 +296,7 @@ solutions of defined Cluster Knapsack problem
 
 ![](images/morning.jpg)
 
-- THat moment, when you decide to explain the problem math friend shortly, but instead of it
-made math problem definition and have to corrupt HTML page with dev-tools to make a good screenshot:
+- That moment, when you decide to shortly explain the problem to math friend, but instead of it
+made the math problem definition and have to corrupt HTML page with dev-tools to make a good screenshot:
 
 ![](images/2019-03-06-math-friend.png)
