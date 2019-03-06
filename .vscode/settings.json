@@ -18,6 +18,8 @@
         "keyring",
         "libvirt",
         "secretfile",
-        "virsh"
-    ]
+        "virsh",
+        "yascod"
+    ],
+    "python.pythonPath": "venv/bin/python3"
 }
