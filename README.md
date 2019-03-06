@@ -279,6 +279,91 @@ virsh dumpxml ubuntu-vmm2 > ubuntu-vmm2.xml
 cp *.xml domains/
 ```
 
+### Deploy CephFS, make it accessible on nodes, put VMs domains
+
+- Deploy Metadata server, from admin node:
+
+```bash
+ceph-deploy mds create ceph1
+```
+
+- Ensure that Ceph Storage Cluster is on, and there is one metadata server:
+
+```bash
+$ ceph -s
+  cluster:
+    id:     96e847ee-bc17-4e6c-913b-68adb9a69fa4
+    health: HEALTH_WARN
+            clock skew detected on mon.ceph2
+...
+```
+
+```bash
+$ ceph mds dump
+...
+max_mds	1
+...
+```
+
+- Create a filesystem
+
+```bash
+ceph osd pool create cephfs_data 64
+ceph osd pool create cephfs_metadata 64
+ceph fs new cephfs cephfs_metadata cephfs_data
+```
+
+![](images/2019-03-06-07-03-cephfs-verification.png)
+
+- Prepare and distribute admin key secret:
+
+```bash
+$ cp /etc/ceph/ceph.client.admin.keyring /etc/ceph/admin.secret
+$ vim $_ && cat $_
+CORRUPTED_ADMIN_SECRET_IN_BASE64==
+
+scp /etc/ceph/admin.secret ayrat:~
+ssh ayrat sudo mv admin.secret /etc/ceph/admin.secret
+
+chmod 400 /etc/ceph/admin.secret
+ssh ayrat sudo chmod 400 /etc/ceph/admin.secret
+```
+
+![](images/2019-03-06-07-14-admin-secret-verification.png)
+
+- Mount the filesystem
+
+```bash
+ls /srv # nothing
+mount -t ceph ceph1:6789:/ /srv -o name=admin,secretfile=/etc/ceph/admin.secret
+```
+
+- Put the domains description into CephFS
+
+```bash
+cp -r domains /srv
+```
+
+- Verify:
+
+![](images/2019-03-06-07-23-cephfs-domains%20verifies.png)
+
+### Write a Cluster Distribution Map in python script
+
+### Define VMM orchestration interface
+
+### Deploy etcd cluster
+
+### Daemon main loop: monitoring cluster state
+
+### Node failure handler: VMs evacuation
+
+### Node recovery handler: VMs redistribution according to CDM
+
+### Hard test
+
+TODO: YouTube link
+
 ## License
 
 According to treatments about Results of Intellectual Activity, this is owned by

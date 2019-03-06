@@ -2,14 +2,22 @@
     "cSpell.words": [
         "Andrey's",
         "Ayrat's",
+        "Ceph's",
         "HWMs",
         "Ilya's",
         "Innopolis",
         "VM's",
         "YASCO",
         "asciiflow",
+        "ayrat",
+        "cephfs",
+        "chmod",
+        "dumpxml",
         "etcd",
         "freebsd",
-        "libvirt"
+        "keyring",
+        "libvirt",
+        "secretfile",
+        "virsh"
     ]
 }
