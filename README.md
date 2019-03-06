@@ -348,7 +348,41 @@ cp -r domains /srv
 
 ![](images/2019-03-06-07-23-cephfs-domains%20verifies.png)
 
-### Write a Cluster Distribution Map in python script
+### Manually hardcode a Cluster Distribution Map in python script
+
+```python
+CDM = {
+    "quark": [ # Ilya's node
+        "freebsd-vmm2",
+        "win7-vmm2",
+    ],
+    "snailin": [ # Ayrat's node
+        "test",
+        "ubuntu-vmm2",
+    ],
+}
+
+CDM_fallbacks = {
+    "quark": { # if Ilya's node is down
+        "snailin": [
+            "freebsd-vmm2",
+            "win7-vmm2",
+            "test",
+            "ubuntu-vmm2",
+        ],
+    },
+    "snailin": { # if Ayrat's node is down
+        "quark": [
+            "freebsd-vmm2",
+            "win7-vmm2",
+            "test",
+            "ubuntu-vmm2",
+        ],
+    },
+}
+
+Cur_CDM = CDM
+```
 
 ### Define VMM orchestration interface
 

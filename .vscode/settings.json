@@ -15,9 +15,11 @@
         "dumpxml",
         "etcd",
         "freebsd",
+        "hardcode",
         "keyring",
         "libvirt",
         "secretfile",
+        "snailin",
         "virsh",
         "yascod"
     ],

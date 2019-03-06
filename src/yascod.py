@@ -2,6 +2,38 @@
 import argparse
 import logging
 
+CDM = {
+    "quark": [ # Ilya's node
+        "freebsd-vmm2",
+        "win7-vmm2",
+    ],
+    "snailin": [ # Ayrat's node
+        "test",
+        "ubuntu-vmm2",
+    ],
+}
+
+CDM_fallbacks = {
+    "quark": { # if Ilya's node is down
+        "snailin": [
+            "freebsd-vmm2",
+            "win7-vmm2",
+            "test",
+            "ubuntu-vmm2",
+        ],
+    },
+    "snailin": { # if Ayrat's node is down
+        "quark": [
+            "freebsd-vmm2",
+            "win7-vmm2",
+            "test",
+            "ubuntu-vmm2",
+        ],
+    },
+}
+
+Cur_CDM = CDM
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
