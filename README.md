@@ -605,6 +605,6 @@ solutions of defined Cluster Knapsack problem
 ![](images/morning.jpg)
 
 - That moment, when you decide to shortly explain the problem to math friend, but instead of it
-made the math problem definition and have to corrupt HTML page with dev-tools to make a good screenshot:
+made the math problem definition and had to corrupt HTML page with dev-tools to make a good screenshot:
 
 ![](images/2019-03-06-math-friend.png)
