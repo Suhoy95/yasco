@@ -268,8 +268,10 @@ apply the CDM depends on situation.
 
 ## Proof-Of-Concept
 
-It is PoC for simple engine if we can solve the Cluster Knapsack problem. For
-3 node I can defined it manually.
+This is PoC for simple engine if we can solve the Cluster Knapsack problem. For
+3 node I can defined CD Map manually, all that I need - it is daemon which will
+keep quorum and detect cluster state changing with further automatic orchestration
+acting.
 
 ### Dump cluster VMs configuration
 
