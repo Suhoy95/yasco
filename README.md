@@ -486,6 +486,81 @@ dom = libvirt_conn.lookupByID(domainIDs[0])
 >>> quit()
 ```
 
+### Host failure detection
+
+For the demo, I assumed two types of HWM failures: (1) complete crash of
+one HWM, or (2) complete network disconnection of one failure. These two cases
+look the same from surrounding view-points. This way, we need make HA-daemon
+detect if neighbor host is unreachable or current host became an unreachable.
+To avoid split-brain situation we rely on the supposed-stable third-side CEPH-cluster in
+the same network.
+
+Initially, I thought to use `etcd` and Raft algorithm to keep consensus. But
+during `etcd` deploy and test it has been found out that the query to etcd is
+just blocked that make impossible to handle failure situation.
+
+So, to finalize the Proof-of-Concept of this idea, I am trying to use classical
+`heartbeat`, `ping` or `ping`-like possibilities to detect required cases.
+It may not be perfect solution, but enough for PoC.
+
+Requirements:
+
+- Detect event of detaching from the cluster
+- Detect event of neighbor failure in the cluster
+
+
+### Daemon main loop: monitoring cluster state
+
+### Node failure handler: VMs evacuation
+
+### Node recovery handler: VMs redistribution according to CDM
+
+### Hard test
+
+TODO: YouTube link
+
+## License
+
+According to treatments about Results of Intellectual Activity, this is owned by
+the [Innopolis University](https://university.innopolis.ru/en/). As author
+I would like to make this work public under GPLv2.
+
+I will be glad to know if you would like to publish this work in scientific
+journals, because, I believe, there will be a lot of article to find optimal
+solutions of defined Cluster Knapsack problem
+
+## References
+
+- [SNE](https://os3.su/)
+- [asciiflow](http://asciiflow.com/)
+- [DO: How To Create a High Availability Setup with Heartbeat and Floating IPs on Ubuntu 14.04](https://www.digitalocean.com/community/tutorials/how-to-create-a-high-availability-setup-with-heartbeat-and-floating-ips-on-ubuntu-14-04)
+- [The Raft Consensus Algorithm](https://raft.github.io/)
+- [etcd](https://github.com/etcd-io/etcd)
+- [CephFS](http://docs.ceph.com/docs/master/cephfs/)
+- [libvirt: Python API bindings](https://libvirt.org/python.html)
+- [Ceph docs. Luminous. CephFS Quick Start](http://docs.ceph.com/docs/luminous/start/quick-cephfs/)
+- [Ceph docs. Luminous. Create a Ceph filesystem](http://docs.ceph.com/docs/luminous/cephfs/createfs/)
+- [Libvirt Application Development Guide Using Python. Edition 1. Version 1.1](https://libvirt.org/docs/libvirt-appdev-guide-python/en-US/html/index.html)
+- [GitHub. etcd-io / etcd : master/Documentation/demo.md](https://github.com/etcd-io/etcd/blob/master/Documentation/demo.md)
+
+## History notes
+
+- Preliminary whiteboard discussion:
+
+![](images/whiteboard-concept.jpg)
+
+- It is one night repository. Such a lovely blizzard outside the Innopolis University:
+
+![](images/morning.jpg)
+
+- That moment, when you decide to shortly explain the problem to math friend, but instead of it
+made the math problem definition and had to corrupt HTML page with dev-tools to make a good screenshot:
+
+![](images/2019-03-06-math-friend.png)
+
+## Misdirected actions
+
+
 ### Deploy etcd cluster
 
 - [GitHub. etcd-io / etcd : master/Documentation/demo.md](https://github.com/etcd-io/etcd/blob/master/Documentation/demo.md)
@@ -553,58 +628,3 @@ etcdctl --endpoints=$ENDPOINTS member list
 
 ![](images/2019-03-06-10-18-verifying-etcd.png)
 
-### Test etcd3 python library
-
-TODO:
-
-- Detect detaching from cluster on the daemon side
-- Detect of neighbor fail
-
-### Daemon main loop: monitoring cluster state
-
-### Node failure handler: VMs evacuation
-
-### Node recovery handler: VMs redistribution according to CDM
-
-### Hard test
-
-TODO: YouTube link
-
-## License
-
-According to treatments about Results of Intellectual Activity, this is owned by
-the [Innopolis University](https://university.innopolis.ru/en/). As author
-I would like to make this work public under GPLv2.
-
-I will be glad to know if you would like to publish this work in scientific
-journals, because, I believe, there will be a lot of article to find optimal
-solutions of defined Cluster Knapsack problem
-
-## References
-
-- [SNE](https://os3.su/)
-- [asciiflow](http://asciiflow.com/)
-- [DO: How To Create a High Availability Setup with Heartbeat and Floating IPs on Ubuntu 14.04](https://www.digitalocean.com/community/tutorials/how-to-create-a-high-availability-setup-with-heartbeat-and-floating-ips-on-ubuntu-14-04)
-- [The Raft Consensus Algorithm](https://raft.github.io/)
-- [etcd](https://github.com/etcd-io/etcd)
-- [CephFS](http://docs.ceph.com/docs/master/cephfs/)
-- [libvirt: Python API bindings](https://libvirt.org/python.html)
-- [Ceph docs. Luminous. CephFS Quick Start](http://docs.ceph.com/docs/luminous/start/quick-cephfs/)
-- [Ceph docs. Luminous. Create a Ceph filesystem](http://docs.ceph.com/docs/luminous/cephfs/createfs/)
-- [Libvirt Application Development Guide Using Python. Edition 1. Version 1.1](https://libvirt.org/docs/libvirt-appdev-guide-python/en-US/html/index.html)
-- [GitHub. etcd-io / etcd : master/Documentation/demo.md](https://github.com/etcd-io/etcd/blob/master/Documentation/demo.md)
-
-## History notes
-
-- Preliminary whiteboard discussion:
-
-![](images/whiteboard-concept.jpg)
-
-- It is one night repository. Such a lovely blizzard outside the Innopolis University:
-
-![](images/morning.jpg)
-
-- That moment, when you decide to shortly explain the problem to math friend, but instead of it
-made the math problem definition and had to corrupt HTML page with dev-tools to make a good screenshot:
-
-![](images/2019-03-06-math-friend.png)
