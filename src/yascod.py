@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
+import subprocess as sp
 import argparse
 import logging
 
 import libvirt
 import etcd3
 
+
+#
+# Cluster Distribution Map (CMD), and its failure variations
+# to handle fault situations
+#
 CDM = {
     "quark": [  # Ilya's node
         "freebsd-vmm2",
@@ -15,9 +21,9 @@ CDM = {
         "ubuntu-vmm2",
     ],
 }
-
 CDM_fallbacks = {
     "quark": {  # if Ilya's node is down
+        "quark": [],
         "snailin": [
             "freebsd-vmm2",
             "win7-vmm2",
@@ -32,10 +38,20 @@ CDM_fallbacks = {
             "test",
             "ubuntu-vmm2",
         ],
+        "snailin": [],
     },
 }
-
 Cur_CDM = CDM
+
+
+def is_host_alive(hostname: str):
+    """
+    Check that the host with Hostname is still in the cluster
+    """
+    ping_pc = sp.run(args=["ping", "-c", "1", hostname],
+                     stdout=sp.PIPE, stderr=sp.PIPE)
+    return ping_pc.returncode == 0
+
 
 
 def parse_args():

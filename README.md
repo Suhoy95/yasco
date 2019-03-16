@@ -508,6 +508,24 @@ Requirements:
 - Detect event of detaching from the cluster
 - Detect event of neighbor failure in the cluster
 
+#### Implementation
+
+For that purpose, we just write an wrapper over system `ping`-command
+([StackOverflow](https://stackoverflow.com/questions/26468640/python-function-to-test-ping),
+[Python3:subprocess](https://docs.python.org/3/library/subprocess.html)):
+
+```Python
+import subprocess as sp
+
+def is_host_alive(hostname: str):
+    ping_pc = sp.run(args=["ping", "-c", "1", hostname], stdout=sp.PIPE, stderr=sp.PIPE)
+    return ping_pc.returncode == 0
+
+```
+
+#### Test: all is ok
+
+
 
 ### Daemon main loop: monitoring cluster state
 
